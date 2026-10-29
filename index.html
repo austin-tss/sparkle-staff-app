@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light">
+<title>Sparkle Staff ✨ (Demo)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+:root{--blush:#F3E7DF;--champ:#EFDED3;--taupe:#C1B1A3;--pink:#e8b4b8}
+*{box-sizing:border-box}body{margin:0;font-family:Poppins,sans-serif;background:var(--blush);color:#222;letter-spacing:.02em}
+header{background:#fff;text-align:center;padding:14px;border-bottom:1px solid var(--taupe)}header img{height:70px}
+.script{font-family:'Great Vibes',cursive;font-size:2rem;color:#8a6f5e}
+.demo{background:#000;color:#fff;font-size:.75rem;text-align:center;padding:4px;letter-spacing:.1em}
+nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:10px}
+nav button,.btn{border:1px solid var(--taupe);background:#fff;border-radius:20px;padding:7px 14px;font-family:inherit;cursor:pointer}
+nav button.on,.btn.p{background:var(--taupe);color:#fff}
+.role{text-align:center;padding-top:10px}main{max-width:900px;margin:auto;padding:10px}
+.card{background:#fff;border-radius:16px;padding:16px;margin:10px 0;box-shadow:0 2px 10px #c1b1a333}
+h2{font-weight:400;letter-spacing:.05em;text-transform:uppercase;font-size:1rem}
+input,select,textarea{font-family:inherit;padding:7px;border:1px solid var(--taupe);border-radius:10px;margin:3px;width:100%}
+table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:6px;border-bottom:1px solid var(--champ);text-align:left}
+.map{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.map div{border:1px dashed var(--taupe);border-radius:10px;padding:10px;text-align:center;font-size:.8rem}.map .hit{background:var(--pink);color:#fff}
+.stub{font-size:.75rem;color:#8a6f5e;font-style:italic}footer{text-align:center;padding:20px;font-size:.8rem;letter-spacing:.15em}
+</style></head><body>
+<div class="demo">DEMO MODE · SAMPLE DATA ONLY · NO LIVE CONNECTIONS</div>
+<header><img src="https://www.sparkletallahassee.com/cdn/shop/files/IMG_5048.png" alt="Sparkle Tallahassee"><div class="script">Sparkle Staff</div><small>Small business. Big heart. 💛</small></header>
+<div class="role"><button class="btn p" onclick="setRole('emp')" id="r-emp">Employee</button> <button class="btn" onclick="setRole('mgr')" id="r-mgr">Manager</button></div>
+<nav id="nav"></nav><main id="main"></main>
+<footer>MORE THAN JUST CLOTHES ✨<br><small>2627 Capital Cir NE · Tallahassee</small></footer>
+<script src="app.js"></script></body></html>
