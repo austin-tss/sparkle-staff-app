@@ -9,6 +9,7 @@ timeoff:[{who:'Demo Kayla',dates:'Nov 14–15',why:'Family trip',st:'Pending'}],
 customers:[{name:'Demo Sarah J.',phone:'(555) 010-0001',note:'Loves western, size S'}],
 orders:[],holds:[{cust:'Demo Sarah J.',item:'Rodeo Fringe Jacket (L)',paid:40,total:128,due:'Nov 20'}],
 queue:[],sales:[{who:'Demo Emma',amt:212},{who:'Demo Brooke',amt:98}],photos:[],notes:[],texts:[]};
+const PINS={'1111':'Demo Emma','2222':'Demo Kayla','3333':'Demo Brooke','9999':'Ashley (Owner)'},MGR=['9999'];let me=null,buf='';
 const save=()=>localStorage.sparkle=JSON.stringify(S);let role='emp',view;
 const E={clock:'⏰ Clock',scan:'📦 Scanner',rack:'📍 Rack Locator',timeoff:'🌸 Time Off',photo:'📸 Insta Photos',cust:'👗 Customers & Orders',text:'💬 Text Customers',holds:'🎀 Layaway/Holds',dr:'🚪 Dressing Rooms',sales:'💰 My Sales',low:'⚠️ Low Stock'};
 const M={approve:'✅ Approve Time Off',post:'📲 Post to Instagram',notify:'🔔 Team Alerts',square:'🟦 Square Day Sales',labels:'🏷️ Shopify Labels',sales:'💰 Sales Credit',low:'⚠️ Low Stock',cust:'📝 Customer Notes'};
@@ -18,18 +19,24 @@ const ICON={clock:'⏰',scan:'📦',rack:'📍',timeoff:'🌸',photo:'📸',cust
 const nm=(T,k)=>T[k].replace(/^\S+\s/,'');
 function setRole(r){role=r;home()}
 function onClock(){const l=S.punches.filter(p=>p.who==S.me).at(-1);return l&&l.t=='IN'?l:null}
-function punch(){const on=onClock();S.punches.push({who:S.me,t:on?'OUT':'IN',at:new Date().toLocaleString(),ms:Date.now()});home()}
-function tabs(){document.getElementById('tabs').innerHTML=[['home','🏠','Home'],['scan','📦','Scan'],['dr','🚪','Rooms'],['mgr','👑',role=='mgr'?'Staff':'Manager']].map(([k,i,t])=>`<button class="${(k=='home'&&!view)||k==view||(k=='mgr'&&role=='mgr'&&!view)?'on':''}" onclick="${k=='home'?'home()':k=='mgr'?`role=role=='mgr'?'emp':'mgr';home()`:`role='emp';go('${k}')`}"><span>${i}</span>${t}</button>`).join('')}
-function home(){view=null;const T=role=='emp'?E:M,on=onClock();
-document.getElementById('top').innerHTML=`<div class="hi">Hi ${S.me.replace('Demo ','')} ✨</div><div class="who" onclick="pickMe()">${role=='mgr'?'Manager':'Stylist'} · switch ▾</div>`;
-let h='';if(role=='emp')h+=`<button class="hero ${on?'out':''}" onclick="punch()"><b>${on?'Clock Out':'Clock In'}</b><small>${on?'On since '+new Date(on.ms||Date.now()).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+' · <span id="tm"></span>':'Tap to start your shift'}</small></button>`;
+function punch(){const on=onClock();S.punches.push({who:S.me,t:on?'OUT':'IN',at:new Date().toLocaleString(),ms:Date.now()});clockScreen()}
+function tabs(){const t=document.getElementById('tabs');if(!me){t.innerHTML='';return}t.innerHTML=[['home','🏠','Home'],['clock','⏰','Clock'],['scan','📦','Scan'],['out','🚪','Log Out']].map(([k,i,x])=>`<button class="${k==(view||'home')?'on':''}" onclick="${k=='home'?'home()':k=='out'?'logout()':k=='clock'?'clockScreen()':`go('${k}')`}"><span>${i}</span>${x}</button>`).join('')}
+function pinPad(){me=null;view='pin';buf='';document.getElementById('top').innerHTML=`<div class="hi" style="text-align:center">Sparkle Staff</div>`;drawPin()}
+function drawPin(msg){document.getElementById('main').innerHTML=`<div class="pinwrap"><p class="lbl">${msg||'Enter your PIN'}</p><div class="dots">${[0,1,2,3].map(i=>`<b class="${i<buf.length?'f':''}"></b>`).join('')}</div><div class="pad">${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k=>`<button onclick="key('${k}')">${k}</button>`).join('')}</div><p class="stub">Demo PINs: 1111 Emma · 2222 Kayla · 3333 Brooke · 9999 Ashley (manager)</p></div>`;tabs()}
+function key(k){if(k=='⌫')buf=buf.slice(0,-1);else if(k=='✓'||buf.length>=4){}else buf+=k;if(buf.length==4){const n=PINS[buf];if(n){me=buf;S.me=n;role=MGR.includes(buf)?'mgr':'emp';return clockScreen()}buf='';return drawPin('Wrong PIN — try again')}drawPin()}
+function logout(){pinPad()}
+function clockScreen(){view='clock';const on=onClock();document.getElementById('top').innerHTML=`<div class="hi">Hi ${S.me.replace('Demo ','').replace(' (Owner)','')} ✨</div>`;
+document.getElementById('main').innerHTML=`<div class="status ${on?'in':''}">${on?'🟢 You\'re clocked in':'⚪ You\'re clocked out'}</div>${on?'<div class="timer" id="tm">00:00:00</div>':''}<button class="hero big ${on?'out':''}" onclick="punch()"><b>${on?'Clock Out':'Clock In'}</b></button><button class="btn" onclick="home()">Go to Home ›</button><button class="btn" onclick="logout()">🚪 Log Out</button>`;tabs();save();tick()}
+function home(){if(!me)return pinPad();view=null;const T=role=='emp'?E:{...M,...E},on=onClock();
+document.getElementById('top').innerHTML=`<div class="hi">Hi ${S.me.replace('Demo ','').replace(' (Owner)','')} ✨</div><div class="who">${role=='mgr'?'👑 Manager':'Stylist'}</div>`;
+let h='';h+=`<button class="hero ${on?'out':''}" onclick="clockScreen()"><b>${on?'Clocked In':'Clock In'}</b><small>${on?'On since '+new Date(on.ms||Date.now()).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+' · <span id="tm"></span>':'Tap to start your shift'}</small></button>`;
 const n={low:low().length,approve:S.timeoff.filter(t=>t.st=='Pending').length,dr:S.queue.length,holds:S.holds.length};
 h+=`<div class="grid">${Object.keys(T).filter(k=>k!='clock').map(k=>`<button class="tile" onclick="go('${k}')"><span class="ic">${ICON[k]}</span>${nm(T,k)}${n[k]?`<i>${n[k]}</i>`:''}</button>`).join('')}</div>`;
-document.getElementById('main').innerHTML=h;tabs();save();tick()}
+h+=`<button class="btn logout" onclick="logout()">🚪 Log Out</button>`;document.getElementById('main').innerHTML=h;tabs();save();tick()}
 function tick(){const on=onClock(),el=document.getElementById('tm');if(on&&el&&on.ms){const d=Math.floor((Date.now()-on.ms)/1000);el.textContent=[d/3600,d/60%60,d%60].map(x=>String(Math.floor(x)).padStart(2,'0')).join(':')}}
 setInterval(tick,1000);
 function pickMe(){const i=prompt('Who are you? (demo)\n'+S.staff.map((s,i)=>i+1+'. '+s).join('\n'));if(S.staff[i-1]){S.me=S.staff[i-1];home()}}
-function go(v){if(v=='clock')return home();view=v;const T=role=='emp'?E:M;
+function go(v){if(!me)return pinPad();if(v=='clock')return clockScreen();view=v;const T={...E,...M};
 document.getElementById('top').innerHTML=`<button class="back" onclick="home()">‹</button><div class="ttl">${ICON[v]} ${nm(T,v)}</div>`;
 document.getElementById('main').innerHTML=`<div class="screen">${V[v]()}</div>`;tabs();save()}
 const tbl=(h,r)=>`<table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${r.map(x=>`<tr>${x.map(y=>`<td>${y}</td>`).join('')}</tr>`).join('')}</table>`;
@@ -55,4 +62,4 @@ labels(){return `<p class="stub">STUB: Shopify not connected; no labels are purc
 function lookup(c){const i=S.inv.find(x=>x.sku==(c||sku.value).trim());res.innerHTML=i?itemCard(i):'<p>Not found (demo SKUs 100001–100004)</p>'}
 async function cam(){if(!('BarcodeDetector'in window))return alert('Camera scanning not supported in this browser — type the SKU.');const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});vid.srcObject=s;vid.style.display='block';await vid.play();const d=new BarcodeDetector();const t=setInterval(async()=>{const r=await d.detect(vid);if(r[0]){clearInterval(t);s.getTracks().forEach(x=>x.stop());vid.style.display='none';lookup(r[0].rawValue)}},400)}
 function snap(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{S.photos.push(r.result);try{go('photo')}catch(e){S.photos.pop();alert('Demo storage full')}};r.readAsDataURL(f)}
-home();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
+pinPad();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
