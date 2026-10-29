@@ -1,26 +1,37 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light">
-<title>Sparkle Staff ✨ (Demo)</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F3E7DF"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Sparkle Staff"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png">
+<title>Sparkle Staff</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
-:root{--blush:#F3E7DF;--champ:#EFDED3;--taupe:#C1B1A3;--pink:#e8b4b8}
-*{box-sizing:border-box}body{margin:0;font-family:Poppins,sans-serif;background:var(--blush);color:#222;letter-spacing:.02em}
-header{background:#fff;text-align:center;padding:14px;border-bottom:1px solid var(--taupe)}header img{height:70px}
-.script{font-family:'Great Vibes',cursive;font-size:2rem;color:#8a6f5e}
-.demo{background:#000;color:#fff;font-size:.75rem;text-align:center;padding:4px;letter-spacing:.1em}
-nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:10px}
-nav button,.btn{border:1px solid var(--taupe);background:#fff;border-radius:20px;padding:7px 14px;font-family:inherit;cursor:pointer}
-nav button.on,.btn.p{background:var(--taupe);color:#fff}
-.role{text-align:center;padding-top:10px}main{max-width:900px;margin:auto;padding:10px}
-.card{background:#fff;border-radius:16px;padding:16px;margin:10px 0;box-shadow:0 2px 10px #c1b1a333}
-h2{font-weight:400;letter-spacing:.05em;text-transform:uppercase;font-size:1rem}
-input,select,textarea{font-family:inherit;padding:7px;border:1px solid var(--taupe);border-radius:10px;margin:3px;width:100%}
-table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:6px;border-bottom:1px solid var(--champ);text-align:left}
-.map{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.map div{border:1px dashed var(--taupe);border-radius:10px;padding:10px;text-align:center;font-size:.8rem}.map .hit{background:var(--pink);color:#fff}
-.stub{font-size:.75rem;color:#8a6f5e;font-style:italic}footer{text-align:center;padding:20px;font-size:.8rem;letter-spacing:.15em}
+:root{--blush:#F3E7DF;--champ:#EFDED3;--taupe:#C1B1A3;--deep:#8a6f5e;--rose:#d99aa5}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;height:100%}
+body{font-family:Poppins,sans-serif;background:var(--blush);color:#2b2220;max-width:520px;margin:auto;padding-bottom:90px;user-select:none}
+.demo{background:#000;color:#fff;font-size:11px;text-align:center;padding:3px;letter-spacing:.12em}
+#top{display:flex;align-items:center;gap:10px;padding:14px 18px 6px;min-height:70px;flex-wrap:wrap}
+.hi{font-family:'Great Vibes',cursive;font-size:38px;color:var(--deep);flex:1}.who{font-size:13px;background:#fff;padding:8px 14px;border-radius:99px}
+.back{width:58px;height:58px;border-radius:50%;border:0;background:#fff;font-size:38px;line-height:1;color:var(--deep);box-shadow:0 3px 10px #c1b1a355}
+.ttl{font-size:22px;font-weight:600}
+main{padding:8px 16px}
+.hero{width:100%;border:0;border-radius:28px;padding:34px 10px;background:linear-gradient(135deg,#e7a9b4,#c99aa0);color:#fff;font-family:inherit;box-shadow:0 8px 22px #d99aa577;margin-bottom:16px}
+.hero.out{background:linear-gradient(135deg,#a8927f,#7d6656)}.hero b{display:block;font-size:34px}.hero small{font-size:15px;opacity:.9}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tile{position:relative;aspect-ratio:1/0.9;border:0;border-radius:24px;background:#fff;font-family:inherit;font-size:17px;font-weight:600;color:#2b2220;box-shadow:0 4px 14px #c1b1a344;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.tile:active,.hero:active,.btn:active{transform:scale(.96)}.ic{font-size:46px}
+.tile i{position:absolute;top:10px;right:12px;background:var(--rose);color:#fff;font-style:normal;border-radius:99px;min-width:28px;padding:2px 8px;font-size:14px}
+.screen{background:#fff;border-radius:24px;padding:18px;box-shadow:0 4px 14px #c1b1a344}
+input,select,textarea{font-family:inherit;font-size:18px;padding:16px;border:2px solid var(--champ);border-radius:16px;margin:6px 0;width:100%;background:#fffaf7}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:18px;margin:8px 0;font-family:inherit;font-size:19px;font-weight:600;background:var(--champ);color:#2b2220}
+.btn.p{background:var(--rose);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:15px;margin-top:10px}td,th{padding:12px 6px;border-bottom:1px solid var(--champ);text-align:left}th{font-size:12px;color:var(--deep);text-transform:uppercase}
+td .btn{padding:10px;font-size:15px;margin:3px 0}
+h3{margin:14px 0 4px}.map{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.map div{border:2px dashed var(--taupe);border-radius:14px;padding:14px;text-align:center;font-size:14px}.map .hit{background:var(--rose);color:#fff;border-style:solid}
+.stub{font-size:13px;color:var(--deep);background:var(--blush);padding:10px;border-radius:12px}
+#tabs{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:auto;display:flex;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -4px 16px #c1b1a344;padding:8px 6px calc(8px + env(safe-area-inset-bottom))}
+#tabs button{flex:1;border:0;background:none;font-family:inherit;font-size:12px;color:#9b8a80;display:flex;flex-direction:column;align-items:center;padding:6px}#tabs span{font-size:26px}#tabs .on{color:var(--deep);font-weight:700}
+footer{text-align:center;font-size:11px;letter-spacing:.2em;color:var(--deep);padding:20px}
 </style></head><body>
-<div class="demo">DEMO MODE · SAMPLE DATA ONLY · NO LIVE CONNECTIONS</div>
-<header><img src="https://www.sparkletallahassee.com/cdn/shop/files/IMG_5048.png" alt="Sparkle Tallahassee"><div class="script">Sparkle Staff</div><small>Small business. Big heart. 💛</small></header>
-<div class="role"><button class="btn p" onclick="setRole('emp')" id="r-emp">Employee</button> <button class="btn" onclick="setRole('mgr')" id="r-mgr">Manager</button></div>
-<nav id="nav"></nav><main id="main"></main>
-<footer>MORE THAN JUST CLOTHES ✨<br><small>2627 Capital Cir NE · Tallahassee</small></footer>
+<div class="demo">DEMO · SAMPLE DATA · NOT CONNECTED</div>
+<div id="top"></div><main id="main"></main>
+<footer>MORE THAN JUST CLOTHES 💛</footer>
+<nav id="tabs"></nav>
 <script src="app.js"></script></body></html>
