@@ -9,7 +9,7 @@ timeoff:[{who:'Demo Kayla',dates:'Nov 14–15',why:'Family trip',st:'Pending'}],
 customers:[{name:'Demo Sarah J.',phone:'(555) 010-0001',note:'Loves western, size S'}],
 orders:[],holds:[{cust:'Demo Sarah J.',item:'Rodeo Fringe Jacket (L)',paid:40,total:128,due:'Nov 20'}],
 queue:[],sales:[{who:'Demo Emma',amt:212},{who:'Demo Brooke',amt:98}],photos:[],notes:[],texts:[]};
-const PINS={'1111':'Demo Emma','2222':'Demo Kayla','3333':'Demo Brooke','9999':'Ashley (Owner)'},MGR=['9999'];let me=null,buf='';
+const PINS={'1234':'Demo Emma','2222':'Demo Kayla','3333':'Demo Brooke','9999':'Ashley (Owner)'},MGR=['9999'];let me=null,buf='';
 const save=()=>localStorage.sparkle=JSON.stringify(S);let role='emp',view;
 const E={clock:'⏰ Clock',scan:'📦 Scanner',rack:'📍 Rack Locator',timeoff:'🌸 Time Off',photo:'📸 Insta Photos',cust:'👗 Customers & Orders',text:'💬 Text Customers',holds:'🎀 Layaway/Holds',dr:'🚪 Dressing Rooms',sales:'💰 My Sales',low:'⚠️ Low Stock'};
 const M={approve:'✅ Approve Time Off',post:'📲 Post to Instagram',notify:'🔔 Team Alerts',square:'🟦 Square Day Sales',labels:'🏷️ Shopify Labels',sales:'💰 Sales Credit',low:'⚠️ Low Stock',cust:'📝 Customer Notes'};
@@ -22,7 +22,7 @@ function onClock(){const l=S.punches.filter(p=>p.who==S.me).at(-1);return l&&l.t
 function punch(){const on=onClock();S.punches.push({who:S.me,t:on?'OUT':'IN',at:new Date().toLocaleString(),ms:Date.now()});clockScreen()}
 function tabs(){const t=document.getElementById('tabs');if(!me){t.innerHTML='';return}t.innerHTML=[['home','🏠','Home'],['clock','⏰','Clock'],['scan','📦','Scan'],['out','🚪','Log Out']].map(([k,i,x])=>`<button class="${k==(view||'home')?'on':''}" onclick="${k=='home'?'home()':k=='out'?'logout()':k=='clock'?'clockScreen()':`go('${k}')`}"><span>${i}</span>${x}</button>`).join('')}
 function pinPad(){me=null;view='pin';buf='';document.getElementById('top').innerHTML=`<div class="hi" style="text-align:center">Sparkle Staff</div>`;drawPin()}
-function drawPin(msg){document.getElementById('main').innerHTML=`<div class="pinwrap"><p class="lbl">${msg||'Enter your PIN'}</p><div class="dots">${[0,1,2,3].map(i=>`<b class="${i<buf.length?'f':''}"></b>`).join('')}</div><div class="pad">${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k=>`<button onclick="key('${k}')">${k}</button>`).join('')}</div><p class="stub">Demo PINs: 1111 Emma · 2222 Kayla · 3333 Brooke · 9999 Ashley (manager)</p></div>`;tabs()}
+function drawPin(msg){document.getElementById('main').innerHTML=`<div class="pinwrap"><p class="lbl">${msg||'Enter your PIN'}</p><div class="dots">${[0,1,2,3].map(i=>`<b class="${i<buf.length?'f':''}"></b>`).join('')}</div><div class="pad">${[1,2,3,4,5,6,7,8,9,'⌫',0,'✓'].map(k=>`<button onclick="key('${k}')">${k}</button>`).join('')}</div><p class="stub">Demo PINs: 1234 Emma · 2222 Kayla · 3333 Brooke · 9999 Ashley (manager)</p></div>`;tabs()}
 function key(k){if(k=='⌫')buf=buf.slice(0,-1);else if(k=='✓'||buf.length>=4){}else buf+=k;if(buf.length==4){const n=PINS[buf];if(n){me=buf;S.me=n;role=MGR.includes(buf)?'mgr':'emp';return clockScreen()}buf='';return drawPin('Wrong PIN — try again')}drawPin()}
 function logout(){pinPad()}
 function clockScreen(){view='clock';const on=onClock();document.getElementById('top').innerHTML=`<div class="hi">Hi ${S.me.replace('Demo ','').replace(' (Owner)','')} ✨</div>`;
