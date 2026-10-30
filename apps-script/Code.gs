@@ -17,10 +17,36 @@ function doPost(e){
   }finally{lock.releaseLock()}
 }
 function doGet(){return ContentService.createTextOutput('Sparkle Staff log endpoint OK')}
-// Placeholder: virtual try-on via FASHN. Key will live in Script Properties as FASHN_API_KEY.
-// Not wired yet; will need the script.external_request scope when implemented.
+// Virtual try-on via FASHN v1.6. Key lives in Script Properties as FASHN_API_KEY.
+const J=o=>ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
+function tryonFolder_(){const it=DriveApp.getFoldersByName('Sparkle Try-On');return it.hasNext()?it.next():DriveApp.createFolder('Sparkle Try-On')}
+function dataUrlBlob_(d,name){const m=/^data:([^;]+);base64,(.*)$/.exec(d||'');if(!m)return null;return Utilities.newBlob(Utilities.base64Decode(m[2]),m[1],name)}
 function tryon(body){
   const key=PropertiesService.getScriptProperties().getProperty('FASHN_API_KEY');
-  const out=key?{ok:false,error:'tryon not implemented yet'}:{ok:false,error:'FASHN_API_KEY not set'};
-  return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
+  if(!key)return J({ok:false,error:'Try-on not set up yet'});
+  const person=body.person,garment=body.garment;
+  if(!/^data:image\//.test(person||'')||!/^data:image\//.test(garment||''))return J({ok:false,error:'Need a customer photo and an item photo'});
+  const cat=['auto','tops','bottoms','one-pieces'].includes(body.category)?body.category:'auto';
+  const H={Authorization:'Bearer '+key};
+  try{
+    const r=UrlFetchApp.fetch('https://api.fashn.ai/v1/run',{method:'post',contentType:'application/json',headers:H,muteHttpExceptions:true,
+      payload:JSON.stringify({model_name:'tryon-v1.6',inputs:{model_image:person,garment_image:garment,category:cat,mode:'balanced',output_format:'jpeg',return_base64:true}})});
+    const run=JSON.parse(r.getContentText()||'{}');
+    if(r.getResponseCode()>=300||!run.id)return J({ok:false,error:'Try-on service error: '+(run.error&&(run.error.message||run.error)||r.getResponseCode())});
+    let st={},t0=Date.now();
+    while(Date.now()-t0<90000){
+      Utilities.sleep(2500);
+      st=JSON.parse(UrlFetchApp.fetch('https://api.fashn.ai/v1/status/'+run.id,{headers:H,muteHttpExceptions:true}).getContentText()||'{}');
+      if(st.status==='completed'||st.status==='failed'||st.status==='canceled')break;
+    }
+    if(st.status!=='completed'||!(st.output||[])[0])return J({ok:false,error:st.error?(st.error.message||st.error.name||String(st.error)):'Try-on took too long, try again'});
+    let out=st.output[0];
+    if(!/^data:/.test(out)){const b=UrlFetchApp.fetch(out).getBlob();out='data:'+b.getContentType()+';base64,'+Utilities.base64Encode(b.getBytes())}
+    const stamp=Utilities.formatDate(new Date(),'America/New_York','yyyy-MM-dd HHmmss');
+    const who=String(body.who||'').slice(0,60),item=String(body.item||'').slice(0,100);
+    try{const f=tryonFolder_();const tag=stamp+' '+(item||'item');
+      [[person,'customer'],[out,'result']].forEach(([d,n])=>{const b=dataUrlBlob_(d,tag+' '+n+'.jpg');if(b)f.createFile(b)})}catch(e){}
+    try{SpreadsheetApp.openById(SHEET_ID).getSheetByName('Log').appendRow([Utilities.formatDate(new Date(),'America/New_York','M/d/yyyy h:mm:ss a')+' ET',who,'tryon',(item||'item')+' · '+cat,'',String(body.session||''),'tryon-'+run.id,Utilities.formatDate(new Date(),'America/New_York','M/d/yyyy h:mm:ss a')+' ET'])}catch(e){}
+    return J({ok:true,image:out});
+  }catch(e){return J({ok:false,error:'Try-on failed: '+e.message})}
 }

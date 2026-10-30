@@ -24,11 +24,11 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||
 document.addEventListener('change',e=>{if(e.target.type=='file')log('photo_captured',view)},true);
 const PINS={'1234':'Demo Emma','2222':'Demo Kayla','3333':'Demo Brooke','9999':'Ashley (Owner)'},MGR=['9999'];let me=null,buf='';
 const save=()=>localStorage.sparkle=JSON.stringify(S);let role='emp',view;
-const E={clock:'⏰ Clock',scan:'📦 Scanner',rack:'📍 Rack Locator',timeoff:'🌸 Time Off',photo:'📸 Insta Photos',cust:'👗 Customers & Orders',text:'💬 Text Customers',holds:'🎀 Layaway/Holds',dr:'🚪 Dressing Rooms',sales:'💰 My Sales',low:'⚠️ Low Stock'};
+const E={clock:'⏰ Clock',tryon:'✨ Try It On',scan:'📦 Scanner',rack:'📍 Rack Locator',timeoff:'🌸 Time Off',photo:'📸 Insta Photos',cust:'👗 Customers & Orders',text:'💬 Text Customers',holds:'🎀 Layaway/Holds',dr:'🚪 Dressing Rooms',sales:'💰 My Sales',low:'⚠️ Low Stock'};
 const M={activity:'🛡️ Activity',approve:'✅ Approve Time Off',post:'📲 Post to Instagram',notify:'🔔 Team Alerts',square:'🟦 Square Day Sales',labels:'🏷️ Shopify Labels',sales:'💰 Sales Credit',low:'⚠️ Low Stock',cust:'📝 Customer Notes'};
 const tot=i=>Object.values(i.sizes).reduce((a,b)=>a+b,0),low=()=>S.inv.filter(i=>tot(i)<=3||Object.values(i.sizes).includes(0));
 
-const ICON={activity:'🛡️',clock:'⏰',scan:'📦',rack:'📍',timeoff:'🌸',photo:'📸',cust:'👗',text:'💬',holds:'🎀',dr:'🚪',sales:'💰',low:'⚠️',approve:'✅',post:'📲',notify:'🔔',square:'🟦',labels:'🏷️'};
+const ICON={activity:'🛡️',tryon:'✨',clock:'⏰',scan:'📦',rack:'📍',timeoff:'🌸',photo:'📸',cust:'👗',text:'💬',holds:'🎀',dr:'🚪',sales:'💰',low:'⚠️',approve:'✅',post:'📲',notify:'🔔',square:'🟦',labels:'🏷️'};
 const nm=(T,k)=>T[k].replace(/^\S+\s/,'');
 function setRole(r){role=r;home()}
 function onClock(){const l=S.punches.filter(p=>p.who==S.me).at(-1);return l&&l.t=='IN'?l:null}
@@ -56,6 +56,7 @@ const tbl=(h,r)=>`<table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${r.map(x
 const mapOf=z=>`<div class="map">${[...new Set(S.inv.map(i=>i.zone))].map(x=>`<div class="${x==z?'hit':''}">${x}</div>`).join('')}</div>`;
 const itemCard=i=>`<h3>${i.name}</h3><p>SKU ${i.sku} · <b>${i.zone}</b> · Bin ${i.bin} · ${i.shelf} · Qty ${tot(i)}</p><p>Sizes left: ${Object.entries(i.sizes).map(([s,q])=>`${s}: ${q}`).join(' · ')}</p>${mapOf(i.zone)}`;
 const V={
+tryon(){toReset();return tryonView()},
 activity(){const L=(S.log||[]).slice().reverse(),f=L.filter(e=>e.event=='login_failed'),since=Date.now()-36e5;
 const recentF=(S.log||[]).filter(e=>e.event=='login_failed'&&parseInt(e.id,36)>since).length;
 return `${recentF>=3?`<div class="warn">⚠️ ${recentF} failed PIN attempts in the last hour</div>`:''}<p class="stub">This device's log. ${LOG_URL?`Syncing to the Google Sheet · ${(S.q||[]).length} waiting`:`Central sheet not connected yet — ${(S.q||[]).length} events queued`}.</p>
@@ -81,3 +82,23 @@ function lookup(c){const q=(c||sku.value).trim(),i=S.inv.find(x=>x.sku==q);log('
 async function cam(){if(!('BarcodeDetector'in window))return alert('Camera scanning not supported in this browser — type the SKU.');const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});vid.srcObject=s;vid.style.display='block';await vid.play();const d=new BarcodeDetector();const t=setInterval(async()=>{const r=await d.detect(vid);if(r[0]){clearInterval(t);s.getTracks().forEach(x=>x.stop());vid.style.display='none';lookup(r[0].rawValue)}},400)}
 function snap(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{S.photos.push(r.result);try{go('photo')}catch(e){S.photos.pop();alert('Demo storage full')}};r.readAsDataURL(f)}
 log('app_open');pinPad();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
+
+// ---- Virtual try-on (images live in memory only; never localStorage, never camera roll) ----
+let TO={step:'consent',person:null,garment:null,cat:'auto',item:'',img:null,err:''};
+function toReset(){TO={step:'consent',person:null,garment:null,cat:'auto',item:'',img:null,err:''}}
+function toGo(st){TO.step=st;document.getElementById('main').innerHTML=`<div class="screen">${tryonView()}</div>`}
+function toShrink(inp,k,next){const f=inp.files[0];inp.value='';if(!f)return;const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const m=1024,r=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);TO[k]=c.toDataURL('image/jpeg',.85);toGo(next)};im.src=u}
+const toImg=d=>`<img src="${d}" style="width:100%;max-height:46vh;object-fit:contain;border-radius:20px;background:#F7F7F7;margin:8px 0">`;
+function tryonView(){const s=TO.step;
+if(s=='consent')return `<p style="font-size:18px;text-align:center">Ask first: is it OK to take a photo to show how this looks on you? The photo goes to Sparkle's private Drive, not this phone.</p><button class="hero" onclick="log('tryon_consent');toGo('person')"><b>✅ Customer said OK</b><small>to a photo</small></button><button class="btn" onclick="toReset();home()">Not now</button>`;
+if(s=='person')return `<p style="font-size:18px;text-align:center">Step 1 of 2 · Full-body photo of the customer, standing straight</p><label class="hero" style="display:block;text-align:center"><b>📷 Take Customer Photo</b><small>opens the camera</small><input type="file" accept="image/*" capture="environment" style="display:none" onchange="toShrink(this,'person','garment')"></label><button class="btn" onclick="toReset();home()">Cancel</button>`;
+if(s=='garment')return `${toImg(TO.person)}<p style="font-size:18px;text-align:center">Step 2 of 2 · Photo of the item (flat or on a hanger works)</p><input id="toitem" placeholder="Item name or SKU (optional)" value="${TO.item}" oninput="TO.item=this.value"><label class="hero" style="display:block;text-align:center"><b>👗 Item Photo</b><small>take or choose a picture</small><input type="file" accept="image/*" style="display:none" onchange="toShrink(this,'garment','ready')"></label><button class="btn" onclick="TO.person=null;toGo('person')">Retake customer photo</button>`;
+if(s=='ready')return `<div style="display:flex;gap:8px">${[TO.person,TO.garment].map(d=>`<img src="${d}" style="width:50%;height:30vh;object-fit:contain;border-radius:18px;background:#F7F7F7">`).join('')}</div><p style="text-align:center;font-size:17px;margin:12px 0 4px">What kind of item?</p><div class="grid">${[['auto','✨ Not sure'],['tops','👚 Top'],['bottoms','👖 Bottoms'],['one-pieces','👗 Dress / Set']].map(([k,l])=>`<button class="tile" style="aspect-ratio:auto;padding:16px;${TO.cat==k?'outline:3px solid #C1B1A3':''}" onclick="TO.cat='${k}';toGo('ready')">${l}</button>`).join('')}</div><button class="hero" style="margin-top:14px" onclick="toRun()"><b>💖 Show Me</b><small>takes about 10–30 seconds</small></button><button class="btn" onclick="TO.garment=null;toGo('garment')">Change item photo</button>`;
+if(s=='loading')return `<div style="text-align:center;padding:60px 10px"><div style="font-size:64px">✨</div><p style="font-size:22px;font-weight:600">Styling your look…</p><p style="font-size:16px;color:#7d6656">This takes about 10–30 seconds</p></div>`;
+if(s=='result')return `<img src="${TO.img}" style="width:100%;max-height:72vh;object-fit:contain;border-radius:22px;background:#F7F7F7"><button class="hero" style="margin-top:12px" onclick="TO.garment=null;TO.img=null;TO.item='';toGo('garment')"><b>🔁 Try Another</b><small>same customer, new item</small></button><button class="btn" onclick="toReset();home()">Done</button>`;
+if(s=='error')return `<div style="text-align:center;padding:40px 10px"><div style="font-size:56px">🙈</div><p style="font-size:20px;font-weight:600">${TO.err}</p></div><button class="hero" onclick="toGo('ready')"><b>Try Again</b></button><button class="btn" onclick="toReset();home()">Done</button>`;
+return ''}
+async function toRun(){toGo('loading');log('tryon_request',(TO.item||'item')+' · '+TO.cat);
+try{if(!LOG_URL)throw new Error('Try-on not set up yet');const r=await fetch(LOG_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'tryon',person:TO.person,garment:TO.garment,category:TO.cat,item:TO.item,who:S.me,session:SID})});
+const j=await r.json();if(!j.ok||!j.image)throw new Error(/not implemented|KEY not set/.test(j.error||'')?'Try-on not set up yet':(j.error||'Something went wrong'));TO.img=j.image;toGo('result')}
+catch(e){TO.err=/JSON|Failed to fetch|NetworkError/.test(e.message)?'Couldn\'t reach the try-on service. Check Wi-Fi and try again.':e.message;toGo('error')}}
