@@ -11,7 +11,7 @@ orders:[],holds:[{cust:'Demo Sarah J.',item:'Rodeo Fringe Jacket (L)',paid:40,to
 queue:[],sales:[{who:'Demo Emma',amt:212},{who:'Demo Brooke',amt:98}],photos:[],notes:[],texts:[]};
 // ---- Activity log ----
 // Paste the deployed Apps Script web-app URL here (public endpoint, not a secret). Empty = queue locally.
-const LOG_URL='';
+const LOG_URL='https://script.google.com/macros/s/AKfycbw2bLo6nKM661vGhSO-mCD5NzFK6vvHi0yqJJBEp5gtb4kgkztMnWGClFJE4mC2WONwXg/exec';
 const SID=Math.random().toString(36).slice(2,10);
 const etNow=()=>new Date().toLocaleString('en-US',{timeZone:'America/New_York',dateStyle:'short',timeStyle:'medium'})+' ET';
 function log(ev,detail=''){const e={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),time:etNow(),who:(typeof me!=='undefined'&&me)?S.me:'(not logged in)',event:ev,detail:String(detail).slice(0,300),device:navigator.userAgent,session:SID};
